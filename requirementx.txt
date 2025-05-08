@@ -1,0 +1,11 @@
+streamlit
+openai
+langchain
+langchain-openai
+langchain-community
+beautifulsoup4
+requests
+pdfminer.six
+pymupdf
+chromadb
+pandas

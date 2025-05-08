@@ -5,12 +5,10 @@ import tempfile
 import streamlit as st
 import base64
 import time
-import chromadb
-import chromadb.config
 from difflib import SequenceMatcher
 from bs4 import BeautifulSoup
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -110,13 +108,11 @@ def analyze_with_rag(pdf_path, openai_key, task_type, question=None):
     docs = splitter.split_documents(pages)
 
     embeddings = OpenAIEmbeddings()
-    if os.path.exists("./chroma_db"):
-        import shutil
-        shutil.rmtree("./chroma_db")
-    vectordb = Chroma.from_documents(docs, embedding=embeddings)
+    
+    vectordb = FAISS.from_documents(docs, embedding=embeddings)
     retriever = vectordb.as_retriever(search_kwargs={"k": 15})
 
-    llm = ChatOpenAI(model_name="gpt-4o", temperature=0.1)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
     rag_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever, chain_type="refine")
 
     if task_type == "Summarise":
